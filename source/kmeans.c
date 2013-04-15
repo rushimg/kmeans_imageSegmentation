@@ -16,8 +16,6 @@
 #define BIGNUM        100000000
 /**
  * rough version of K-means algorithm to highlight the algorithm
- * need to impliment a random creation of centroids
- * also need to add distance calculations based on rgb values
  **/
 
 void k_means(float *imageIn)

@@ -20,30 +20,54 @@
  * also need to add distance calculations based on rgb values
  **/
 
-void k_means(float *imageIn, float *centroids)
+void k_means(float *imageIn)
 {
-    // the output cluster vector
-    int numElements = DIM;
-    size_t size = numElements*numElements* sizeof(float);
+    // the cluster vector
+    int numElements = DIM*DIM;
+    size_t size = numElements * sizeof(float);
     float *cluster = (float*) malloc(size);
+    
+    // the centroids or means
+    int means = CLUSTERS;
+    float *centroids = (float*) malloc(means);
+    float *accumulator = (float*) malloc(means);/*needed for average step */
+    float *numPixelsCentroid  = (float*) malloc(means);/*needed for the update average step*/
                 
     int iters = 0;
-    int i,j;
+    int i,j,temp;
     float distance;
     int min_temp = BIGNUM;
     
     while (iters<ITERS) {
-        for ( i=0; i < DIM-1; i++){
-            for ( j = 0; j < DIM-1; j++) {
-                distance = imageIn[i]-centroids[j];/*compare image to centroids*/
+        //assignment step-> assign each point to cluster of closest centroid
+        for ( i=0; i < numElements-1; i++){
+            for ( j = 0; j < means-1; j++) {
+                distance = abs(imageIn[i]-centroids[j]);/*compare image to centroids*/
                 if (distance < min_temp){
                     min_temp = distance;
                     cluster[i] = j; /* assign this point to current cluster*/
                 }
             }
         }
+        
+        //update step-> set centroid of each cluster as mean
+        for ( i=0; i < numElements-1; i++){
+                temp = cluster[i];
+                accumulator[temp] += imageIn[i];
+                /* for cluster
+                 * get its centroid
+                 * and accumulate the pixel values matching this cluster
+                 */
+                numPixelsCentroid[i]+=1;
+        }
+        for ( j = 0; j < means-1; j++) {
+            centroids[j] = accumulator[j]/numPixelsCentroid[j];
+            //reset
+            accumulator[j] =0;
+            numPixelsCentroid[j] =0;
+        }
+        
         iters++;/* currently using iters rather than a convergence*/
     }
 }
-
 

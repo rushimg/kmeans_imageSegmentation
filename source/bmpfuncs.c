@@ -3,7 +3,7 @@
 
 #include "bmpfuncs.h"
 
-void storeImage(float *imageOut, const char *filename, int rows, int cols, 
+void storeImage(float *imageOut, const char *filename, int rows, int cols,
                 const char* refFilename) {
 
    FILE *ifp, *ofp;
@@ -52,23 +52,23 @@ void storeImage(float *imageOut, const char *filename, int rows, int cols,
    }
 
    // NOTE bmp formats store data in reverse raster order (see comment in
-   // readImage function), so we need to flip it upside down here.  
+   // readImage function), so we need to flip it upside down here.
    int mod = width % 4;
    if(mod != 0) {
       mod = 4 - mod;
    }
-   //   printf("mod = %d\n", mod);
+   // printf("mod = %d\n", mod);
    for(i = height-1; i >= 0; i--) {
       for(j = 0; j < width; j++) {
          tmp = (unsigned char)imageOut[i*cols+j];
          fwrite(&tmp, sizeof(char), 1, ofp);
       }
-      // In bmp format, rows must be a multiple of 4-bytes.  
+      // In bmp format, rows must be a multiple of 4-bytes.
       // So if we're not at a multiple of 4, add junk padding.
       for(j = 0; j < mod; j++) {
          fwrite(&tmp, sizeof(char), 1, ofp);
       }
-   } 
+   }
 
    fclose(ofp);
    fclose(ifp);
@@ -77,8 +77,8 @@ void storeImage(float *imageOut, const char *filename, int rows, int cols,
 }
 
 /*
- * Read bmp image and convert to byte array. Also output the width and height
- */
+* Read bmp image and convert to byte array. Also output the width and height
+*/
 float* readImage(const char *filename, int* widthOut, int* heightOut) {
 
    uchar* imageData;
@@ -106,7 +106,7 @@ float* readImage(const char *filename, int* widthOut, int* heightOut) {
    printf("height = %d\n", height);
 
    *widthOut = width;
-   *heightOut = height;    
+   *heightOut = height;
 
    imageData = (uchar*)malloc(width*height);
    if(imageData == NULL) {
@@ -122,9 +122,9 @@ float* readImage(const char *filename, int* widthOut, int* heightOut) {
        mod = 4 - mod;
    }
 
-   // NOTE bitmaps are stored in upside-down raster order.  So we begin
-   // reading from the bottom left pixel, then going from left-to-right, 
-   // read from the bottom to the top of the image.  For image analysis, 
+   // NOTE bitmaps are stored in upside-down raster order. So we begin
+   // reading from the bottom left pixel, then going from left-to-right,
+   // read from the bottom to the top of the image. For image analysis,
    // we want the image to be right-side up, so we'll modify it here.
 
    // First we read the image in upside-down
@@ -137,7 +137,7 @@ float* readImage(const char *filename, int* widthOut, int* heightOut) {
          fread(&tmp, sizeof(char), 1, fp);
          imageData[i*width + j] = tmp;
       }
-      // For the bmp format, each row has to be a multiple of 4, 
+      // For the bmp format, each row has to be a multiple of 4,
       // so I need to read in the junk data and throw it away
       for(j = 0; j < mod; j++) {
          fread(&tmp, sizeof(char), 1, fp);
